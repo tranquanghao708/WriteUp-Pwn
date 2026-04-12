@@ -1,7 +1,7 @@
 <div align="center">
 
 #  Buffer Overflow Exploitation
-### WriteUp: Khai thác BOF bằng C script — không dùng pwntools
+### WriteUp: Khai thác BOF bằng C script — không dùng script python pwntools
 
 ![Platform](https://img.shields.io/badge/Platform-Linux%20x64-informational?style=flat-square&logo=linux&logoColor=white&color=0a0a0a)
 ![Language](https://img.shields.io/badge/Language-C-blue?style=flat-square&logo=c)
@@ -112,17 +112,17 @@ Found at offset 64
 
 ### Stack layout
 
-
-┌───────────────────────────────┐  ← địa chỉ thấp
+```
+┌───────────────────────────────┐  <- địa chỉ thấp
 │  buf[64]  (local variable)    │
 ├───────────────────────────────┤
 │  padding / saved registers    │
-├───────────────────────────────┤  ← RBP  (offset = 64)
+├───────────────────────────────┤  <- RBP  (offset = 64)
 │  Saved Base Pointer (RBP)     │
-├───────────────────────────────┤  ← RBP + 8
-│  Return Address  < mục tiêu > │  ← offset = 72
-└───────────────────────────────┘  ← địa chỉ cao
-
+├───────────────────────────────┤  <- RBP + 8
+│  Return Address  < mục tiêu > │  <- offset = 72
+└───────────────────────────────┘  <- địa chỉ cao
+```
 
 > **Công thức:** `offset_RBP + 8 = 64 + 8 = 72` → đây là offset chính xác để ghi đè return address.
 
@@ -138,7 +138,7 @@ Found at offset 64
 
 ```
 Dump of assembler code for function flag:
-   0x0000555555555159 <+0>:  push rbp       ← đây là địa chỉ cần lấy
+   0x0000555555555159 <+0>:  push rbp       <- đây là địa chỉ cần lấy
    ...
 ```
 
