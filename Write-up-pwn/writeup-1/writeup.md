@@ -1,6 +1,6 @@
 <div align="center">
 
-# 💥 Buffer Overflow Exploitation
+#  Buffer Overflow Exploitation
 ### WriteUp: Khai thác BOF bằng C script — không dùng pwntools
 
 ![Platform](https://img.shields.io/badge/Platform-Linux%20x64-informational?style=flat-square&logo=linux&logoColor=white&color=0a0a0a)
@@ -12,7 +12,7 @@
 
 ---
 
-## 📋 Mục lục
+##  Mục lục
 
 - [BOF là gì?](#-i-bof-là-gì)
 - [Tại sao ghi đè RBP lại crash?](#-i1-tại-sao-ghi-đè-rbp-lại-crash)
@@ -21,7 +21,7 @@
 
 ---
 
-## 🔍 I. BOF là gì?
+##  I. BOF là gì?
 
 **Buffer Overflow (BOF)** là lỗ hổng cho phép ghi dữ liệu vượt ra ngoài vùng nhớ đã cấp phát trên stack. Khi dữ liệu tràn đến `RIP/RBP`, kẻ tấn công có thể điều hướng luồng thực thi đến bất kỳ địa chỉ nào mong muốn.
 
@@ -39,7 +39,7 @@ void vulnerable() {
     char buf[64];
 
     printf("Input: ");
-    scanf("%s", &buf);   // ⚠️  Không giới hạn độ dài — cực kỳ nguy hiểm!
+    scanf("%s", &buf);   //  Không giới hạn độ dài — cực kỳ nguy hiểm!
 
     printf("You entered: %s\n", buf);
 }
@@ -74,14 +74,14 @@ RBP: 0x6161617261616171  ← bị ghi đè bởi chuỗi cyclic
 
 ---
 
-## 🧩 I.1. Tại sao ghi đè RBP lại crash?
+##  I.1. Tại sao ghi đè RBP lại crash?
 
 Lỗi xảy ra tại lệnh `ret` ở cuối hàm `vulnerable()`.
 
 ```
  ┌────────────────────────────────────────────────────────┐
- │  ret  ──► đọc giá trị từ [RSP] và nhảy đến đó         │
- │           nếu giá trị đó không hợp lệ → SIGSEGV 💥    │
+ │  ret  ──> đọc giá trị từ [RSP] và nhảy đến đó          │
+ │           nếu giá trị đó không hợp lệ → SIGSEGV        │
  └────────────────────────────────────────────────────────┘
 ```
 
@@ -96,7 +96,7 @@ Lỗi xảy ra tại lệnh `ret` ở cuối hàm `vulnerable()`.
 
 ---
 
-## 📐 II. Cách tính offset
+##  II. Cách tính offset
 
 Vì `RIP` chưa bị ghi đè trực tiếp trong ví dụ này, ta tính offset qua `RBP`:
 
@@ -112,7 +112,7 @@ Found at offset 64
 
 ### Stack layout
 
-```
+
 ┌───────────────────────────────┐  ← địa chỉ thấp
 │  buf[64]  (local variable)    │
 ├───────────────────────────────┤
@@ -120,15 +120,15 @@ Found at offset 64
 ├───────────────────────────────┤  ← RBP  (offset = 64)
 │  Saved Base Pointer (RBP)     │
 ├───────────────────────────────┤  ← RBP + 8
-│  Return Address  ✅ mục tiêu  │  ← offset = 72
+│  Return Address  < mục tiêu > │  ← offset = 72
 └───────────────────────────────┘  ← địa chỉ cao
-```
+
 
 > **Công thức:** `offset_RBP + 8 = 64 + 8 = 72` → đây là offset chính xác để ghi đè return address.
 
 ---
 
-## 💣 III. Khai thác
+##  III. Khai thác
 
 ### Lấy địa chỉ hàm `flag()`
 
@@ -187,17 +187,17 @@ gcc exploit.c -o exploit
 
 ---
 
-## ✅ Kết quả
+##  Kết quả
 
 ```
 FLAGGGGGGGGGGG1234567890000000000000
 ```
 
-Hàm `flag()` đã được gọi thành công thông qua khai thác BOF! 🎉
+Hàm `flag()` đã được gọi thành công thông qua khai thác BOF 
 
 ---
 
-## 🗺️ Tóm tắt luồng tấn công
+##  Tóm tắt luồng tấn công
 
 ```
 Input dài  →  tràn buf[64]  →  ghi đè RBP  →  ghi đè Return Address
@@ -206,7 +206,7 @@ Input dài  →  tràn buf[64]  →  ghi đè RBP  →  ghi đè Return Address
                                               ret nhảy đến flag()
                                                        │
                                                        ▼
-                                              FLAG in ra màn hình 🚩
+                                              FLAG in ra màn hình 
 ```
 
 ---
