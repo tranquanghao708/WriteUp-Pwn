@@ -5,8 +5,8 @@
 - `BOF` thường được gọi là `buffer overflow` là 1 vulnerable cho phép ghi tràn qua vùng nhớ ngoài `stack`, khi tới mục đích cuối cùng thường là `RIP` thì sẽ ghi địa chỉ trỏ tới phần mà hacker muốn trỏ để thực hiện các hành vi độc hại khác nói dễ hiểu hơn là :
 	- Khi chúng ta có 1 đoạn mã nguồn có lỗ hổng BOF ở đây :
 
-```c
 
+```c
 #include <stdio.h>
 #include <string.h>
 
@@ -27,9 +27,9 @@ int main() {
     vulnerable();
     return 0;
 }
-
 ```
-	- trong đó có `flag` là phần minh họa cho mục tiêu của ta thì bây giờ ta mở nó trong gdb thông qua lệnh `gdb ./bof`: 
+
+- trong đó có `flag` là phần minh họa cho mục tiêu của ta thì bây giờ ta mở nó trong gdb thông qua lệnh `gdb ./bof`: 
 
  	![alt text](image.png)
 
