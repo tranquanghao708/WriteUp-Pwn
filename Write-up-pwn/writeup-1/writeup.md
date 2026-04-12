@@ -213,6 +213,6 @@ Input dài  →  tràn buf[64]  →  ghi đè RBP  →  ghi đè Return Address
 
 <div align="center">
 
-Made with ❤️ for learning purposes only. **Use responsibly.**
+được tạo bởi `Trần Quang Hào` **Chỉ dành cho mục đích học tập và thực hành trong lab cho phép**
 
 </div>
