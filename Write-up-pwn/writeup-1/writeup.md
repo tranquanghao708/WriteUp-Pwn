@@ -1,4 +1,4 @@
-#Exploit BOF (buffer overflow) in C script no pwntools python exploit
+# Exploit BOF (buffer overflow) in C script no pwntools python exploit
 >bản `WriteUp` này mình sẽ giải thích chi tiết cách thức hoạt động và khai thác `BOF` bằng script C:
 
 ### I.BOF là gì?
