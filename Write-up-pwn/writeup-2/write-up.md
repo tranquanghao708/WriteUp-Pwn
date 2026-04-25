@@ -5,7 +5,7 @@
 
 > Hai hình ảnh đoạn tin nhắn của `người giao bài nhị phân`
 
-##Đầu tiên. Chúng ta có bài nhị phân của người giao là đoạn code C dưới đây và biên dịch nó :
+## Đầu tiên. Chúng ta có bài nhị phân của người giao là đoạn code C dưới đây và biên dịch nó :
 
 ```c
 #include <stdio.h>
