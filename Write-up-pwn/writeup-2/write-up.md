@@ -1,4 +1,4 @@
-##Write Up giải bài nhị phân
+## Write Up giải bài nhị phân
 
 ![alt text](image.png)
 ![alt text](image2.png)
@@ -55,7 +55,7 @@ int main() {
 
 > ở đây trong hình ảnh, đúng là binary của chúng ta đã bị `no canary`
 
-##Thứ hai : chúng ta tiến hành tính offset của chương trình và lấy địa chỉ của hàm win
+## Thứ hai : chúng ta tiến hành tính offset của chương trình và lấy địa chỉ của hàm win
 
 **Để khám xét và tính offset của một chương tình có lỗi BOF** : thì chúng ta cần phải `làm tràn nó`. Tôi ví dụ làm tràn cái này bằng payload ngẫu nhiên `100 qword`, để có payload ngẫu nhiên. Ta dùng lệnh :
 
@@ -136,7 +136,7 @@ int main() {
 - bây giờ ta biết, `Secret_shell` chính là `hàm win` của ta. Có địa chỉ là instrution là `0x0000555555555199`
 - **Tại sao instrution phải là <secret_shell+0> ?**: vì `secret_shell + 0` nghĩa là không cộng thêm offset nào và việc dùng từ địa chỉ này chỉ đảm bảo nó hoạt động trọn vẹn hàm như tạo vùng nhớ, thực thi đủ lệnh để `ổn định hơn`
 
-##Thứ ba: Exploit
+## Thứ ba: Exploit
 
 - Khi có `offset = 24, vaddr_win = 0x0000555555555199` thì chúng ta tiến hành exploit. Để Exploit, chúng ta cần phải tạo payload đúng để ghi đè vào `RIP` là địa chỉ của hàm win
 - Để làm được điều này, ta cần có một `script C` , hoặc python . Nhưng tus thích C hơn :
