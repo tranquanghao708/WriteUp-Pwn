@@ -27,6 +27,7 @@ extern ssize_t read (int __fd, void *__buf, size_t __nbytes) __wur
 
 ![alt text](image2.png)
 
+> hình ảnh được trích xuất từ file PDF `BG_Kiến trúc máy tính.pdf` và file giáo trình mình có để trong github
 - **vì sao lại gây ra tăng tải trọng và giảm hiệu suất cho hệ thống?** 
 
 	- vì việc `map` các vùng nhớ `lớn hơn mức cho phép` sẽ khiến kernel `làm việc hết sức` để quản lý các `page`, dẫn đến hiện tượng `thrashing(liên tục tráo đổi dữ liệu từ ram và ổ cứng)`
