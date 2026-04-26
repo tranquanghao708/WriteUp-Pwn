@@ -205,3 +205,5 @@ int main(void){
 ![alt text](image12.png)
 
 - và nó hoàn toàn đọc và in ra được,
+
+  **Tác giả: Trần Quang Hào**
