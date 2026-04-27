@@ -189,4 +189,4 @@ int main(void){
 
 - Because from `fgets(buffer,12,stdin);`, number `12 - 1 = 11` and 11 > 10 should crash, and this is buffer overflow vulnerable It very danger 
 
-*WriteUp By : Tran Quang Hao**
+**WriteUp By : Tran Quang Hao**
