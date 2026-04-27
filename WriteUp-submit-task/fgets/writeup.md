@@ -6,9 +6,9 @@ Hi guys, welcome to my writeup. Now here, I will introduce function fgets() in C
 
 - [What's fgets()?](#-what's-fgets)
 
-- [Why fgets() safer read(), scanf()?](#-why-fgets-safer-read-scanf)
+- [Why fgets() safer read(), scanf()?](#-wh)
 
-- [Debug fgets() on GDB](#-debug-fgets-on-gdb)
+- [Debug fgets() on GDB](#-debug)
 
 ## What's fgets()?
 
