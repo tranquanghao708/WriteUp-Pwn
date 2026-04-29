@@ -1,13 +1,7 @@
 /*
-	____________________________________________________________________________
-	|		                 ******PROJRECT******								|
-	|	-> day chinh la cong cu carmkhra-x86 quet lo hong, du an dau tien cua toi			|
-	|	-> se duoc phat trien 1 minh											|
-	|		                 ******TAC GIA*******								|
 	|----------------------------TRAN QUANG HAO----------------------------------
 
 	ngay bat dau che tao: 12/1/2026
-
 */
 #include <stdio.h>
 #include <errno.h>
