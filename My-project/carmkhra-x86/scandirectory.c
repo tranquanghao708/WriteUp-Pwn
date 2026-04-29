@@ -75,7 +75,7 @@ ssize_t directory_access(char *path,/*char *reader_binary,*/ int level){ //ssize
 				}
 
             printf("File: %s\n", full);//in  nếu không thì bỏ 
-            // 🔧 đây là phần khi tìm thây file ở cuối thư mục Bạn có thể gọi AES, XOR, Socket,... ở đây
+            
         }
     }
 
