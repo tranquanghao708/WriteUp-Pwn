@@ -7,13 +7,13 @@ here, my writeup will introduce the PIE mechanism in Linux
 
 # Index
 
-- [1. What is PIE?](#-1.-What-is-PIE?)
+- [1. What is PIE?](#1-What-is-PIE?)
 
-- [2. How to PIE work?](#-2.-How-to-PIE-work?)
+- [2. How to PIE work?](#2-How-to-PIE-work?)
 
-- [3. What happend when without PIE?]()
+- [3. What happend when without PIE?](#3-What-happend-when-without-PIE?)
 
-- [4. Debug different program PIE between without PIE]()
+- [4. Debug different program PIE between without PIE](4-Debug-different-program-PIE-between-without-PIE)
 
 # 1. What is PIE?
 
