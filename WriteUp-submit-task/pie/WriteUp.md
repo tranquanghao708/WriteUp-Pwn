@@ -21,7 +21,7 @@ here, my writeup will introduce the PIE mechanism in Linux
 
 **Different PIE between ASLR?**
 
-- basically it intimate but PIE for changing the binary support ASLR also about ASLR for randomizing address after it ran or in the process executing
+- basically they are closely related but PIE for changing the binary support ASLR also about ASLR for randomizing address after it ran or in the process executing
 
 **How to recognize binary PIE and binary without PIE?**
 
