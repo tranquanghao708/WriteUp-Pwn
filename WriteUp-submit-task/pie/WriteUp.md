@@ -7,17 +7,17 @@ here, my writeup will introduce the PIE mechanism in Linux
 
 # Index
 
-- [1. What is PIE?](#-1-What-is-PIE?)
+- [1. What is PIE?](#1-What-is-PIE)
 
-- [2. How to PIE work?](#-2-How-to-PIE-work?)
+- [2. How to PIE work?](#2-How-to-PIE-work)
 
-- [3. What happend when without PIE?](#-3-What-happend-when-without-PIE?)
+- [3. What happend when without PIE?](#3-What-happend-when-without-PIE)
 
-- [4. Debug different program PIE between without PIE](#-4-Debug-different-program-PIE-between-without-PIE)
+- [4. Debug different program PIE between without PIE](#4-Debug-different-program-PIE-between-without-PIE)
 
 # 1. What is PIE?
 
-`PIE (Position Indepedent Executable)` is mechanism change the binary for it support `ASLR protector` and `Rip relative`. Because normaly when compiled the binary with gcc, would is binary permancent and when change one the `vaddr (virtual address)` into program then access the trash address, other address worse `SEGFAULT (SIGSEGV)` for accessing vaddr unknown
+`PIE (Position Indepedent Executable)` is mechanism change the binary for it support `ASLR protector` and `Rip relative`. Because normaly when compiled the binary with gcc, would is binary permancent and when change one the `vaddr (virtual address)` into program then access the invalid address, other address worse `SEGFAULT (SIGSEGV)` for accessing vaddr unknown
 
 **Different PIE between ASLR?**
 
